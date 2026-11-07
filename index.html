@@ -1781,7 +1781,9 @@
           </div>
 
           <div class="form-card rv" style="transition-delay:120ms">
-            <form id="consultForm" novalidate>
+            <form id="consultForm" name="consultation" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+              <input type="hidden" name="form-name" value="consultation">
+              <p hidden><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
               <div class="form-row">
                 <div class="field">
                   <label class="field-label" for="name">Full name</label>
@@ -2024,18 +2026,14 @@
       btn.textContent = 'Sending…';
       status.textContent = '';
 
-      var data = {};
-      new FormData(form).forEach(function (value, key) { data[key] = value; });
-      data._subject = 'New QONCIERGE_X consultation request';
-
-      fetch('https://formsubmit.co/ajax/info@qonciergex.com', {
+      /* Netlify Forms: the host captures the POST and emails it on */
+      fetch('/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(data)
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(new FormData(form)).toString()
       })
-        .then(function (res) { return res.json(); })
-        .then(function (json) {
-          if (String(json.success) !== 'true') throw new Error('rejected');
+        .then(function (res) {
+          if (!res.ok) throw new Error('rejected');
           btn.textContent = 'Request sent';
           status.className = 'form-status is-ok';
           status.textContent = 'Thanks — we will be in touch within one business day.';
